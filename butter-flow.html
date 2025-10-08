@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Butter Flow — Crée ton manga</title>
+  <style>
+    /* ====== CSS simple et propre ====== */
+    :root{
+      --bg:#0f1724; --card:#0b1220; --accent:#ffce54; --muted:#9aa4b2;
+      --glass: rgba(255,255,255,0.03);
+      font-family: Inter, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    html,body{height:100%;margin:0;background:linear-gradient(180deg, #081022 0%, #06121b 100%);color:#e6eef6}
+    .container{max-width:1100px;margin:28px auto;padding:20px;}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:18px;}
+    header h1{margin:0;font-size:22px;letter-spacing:0.6px}
+    .card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.6)}
+    .grid{display:grid;grid-template-columns:380px 1fr;gap:16px}
+    .auth{display:flex;flex-direction:column;gap:10px}
+    input,button,select,textarea{font-family:inherit;border-radius:8px;border:1px solid rgba(255,255,255,0.06);padding:10px;background:transparent;color:inherit}
+    label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+    .uploader{min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border-radius:10px;background:var(--glass);border:1px dashed rgba(255,255,255,0.04)}
+    .thumb{max-width:100%;max-height:420px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.6)}
+    .controls{display:flex;flex-direction:column;gap:10px}
+    .row{display:flex;gap:8px;align-items:center}
+    .btn{background:linear-gradient(90deg, #2b6bff, #6b5bff);border:none;color:white;padding:10px 14px;border-radius:8px;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+    .small{padding:7px 9px;font-size:13px}
+    footer{margin-top:12px;color:var(--muted);font-size:13px}
+    .status{font-size:13px;color:var(--muted);margin-top:8px}
+    .download{display:inline-flex;align-items:center;gap:8px}
+    @media(max-width:960px){.grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><rect rx='6' width='36' height='36' fill='%23ffce54'/></svg>" alt="logo" style="width:44px;height:44px;border-radius:8px">
+      <div>
+        <h1>Butter Flow</h1>
+        <div style="color:var(--muted);font-size:13px">Transforme et colorise tes pages de manga — avec ton style.</div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- COLONNE GAUCHE: AUTH + UPLOAD -->
+      <div class="card">
+        <div class="auth">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <strong>Compte</strong>
+            <small style="color:var(--muted)" id="userEmail">Non connecté</small>
+          </div>
+
+          <label>Email</label>
+          <input id="email" type="email" placeholder="ton@email.com">
+
+          <label>Mot de passe</label>
+          <input id="password" type="password" placeholder="Mot de passe">
+
+          <div style="display:flex;gap:8px">
+            <button id="signupBtn" class="btn small">S'inscrire</button>
+            <button id="loginBtn" class="btn ghost small">Se connecter</button>
+            <button id="logoutBtn" class="btn ghost small" style="margin-left:auto;display:none">Se déconnecter</button>
+          </div>
+
+          <hr style="border:none;height:1px;background:rgba(255,255,255,0.03);margin:12px 0">
+
+          <strong>Uploader une page</strong>
+          <div class="uploader" id="uploader">
+            <div style="text-align:center">
+              <div style="font-size:13px;color:var(--muted)">Glisse une image ou clique pour choisir</div>
+              <div style="margin-top:8px">
+                <input id="fileInput" type="file" accept="image/*" style="display:none">
+                <button id="pickBtn" class="btn small">Choisir une image</button>
+              </div>
+            </div>
+            <img id="preview" class="thumb" style="display:none">
+          </div>
+
+          <div class="status" id="status">Statut : prêt</div>
+        </div>
+      </div>
+
+      <!-- COLONNE DROITE: CONTROLES & RESULTAT -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <strong>Paramètres de style</strong>
+          <div style="color:var(--muted);font-size:13px">Personnalise le rendu</div>
+        </div>
+
+        <div class="controls">
+          <div>
+            <label>Nom du style/ Mangaka</label>
+            <input id="mangaka" placeholder="Ex : style shōnen, traits fins, hachures lourdes">
+          </div>
+
+          <div>
+            <label>Effets souhaités</label>
+            <select id="effect">
+              <option value="clean_lineart">Lisser traits & lineart propre</option>
+              <option value="contrast_increase">Augmenter contraste & encrage</option>
+              <option value="screen_tone">Ajouter trames (screen-tone)</option>
+              <option value="colorize">Coloriser en style manga coloré</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <button id="generateBtn" class="btn">Transformer (requiert backend)</button>
+            <button id="downloadBtn" class="btn ghost" disabled>Télécharger résultat</button>
+            <div style="margin-left:auto;color:var(--muted);font-size:13px" id="timeInfo"></div>
+          </div>
+
+          <hr style="border:none;height:1px;background:rgba(255,255,255,0.03);margin:6px 0">
+
+          <strong>Aperçu</strong>
+          <div style="margin-top:8px">
+            <img id="resultImg" class="thumb" style="display:none">
+          </div>
+        </div>
+
+        <footer>
+          <div><strong>Backend requis :</strong> Un endpoint sécurisé pour appeler OpenAI / modèle d’image. Voir instructions plus bas.</div>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ======= CONFIG =======
+    // NE PAS mettre ta clé OpenAI ici. FRONTEND: Firebase config ok, mais OPENAI KEY = backend only.
+    const FIREBASE_CONFIG = {
+      apiKey: "TA_FIREBASE_APIKEY",
+      authDomain: "TON_PROJET.firebaseapp.com",
+      projectId: "TON_PROJET",
+      storageBucket: "TON_PROJET.appspot.com",
+      messagingSenderId: "XXX",
+      appId: "XXX"
+    };
+
+    // URL de ton backend (à déployer séparément). Exemple: https://ton-backend.example.com
+    const BACKEND_BASE = "https://TON_BACKEND.example.com";
+
+    // ======= Firebase init (compat via CDN-less, on-the-fly) =======
+    // Charger SDK Firebase dynamiquement (modular SDK)
+    async function loadFirebase() {
+      if (window.firebaseLoaded) return;
+      await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js');
+      await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js');
+      await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js');
+      firebase.initializeApp(FIREBASE_CONFIG);
+      window.auth = firebase.auth();
+      window.storage = firebase.storage();
+      window.firebaseLoaded = true;
+    }
+
+    // ======= UI elements =======
+    const emailEl = document.getElementById('email');
+    const passEl = document.getElementById('password');
+    const signupBtn = document.getElementById('signupBtn');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userEmail = document.getElementById('userEmail');
+
+    const pickBtn = document.getElementById('pickBtn');
+    const fileInput = document.getElementById('fileInput');
+    const preview = document.getElementById('preview');
+    const uploader = document.getElementById('uploader');
+    const status = document.getElementById('status');
+
+    const mangaka = document.getElementById('mangaka');
+    const effect = document.getElementById('effect');
+    const generateBtn = document.getElementById('generateBtn');
+    const resultImg = document.getElementById('resultImg');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const timeInfo = document.getElementById('timeInfo');
+
+    let currentFile = null;
+    let currentResultBlob = null;
+
+    // ======= Auth flow =======
+    (async ()=>{ await loadFirebase(); })();
+
+    signupBtn.onclick = async () => {
+      await loadFirebase();
+      try {
+        const user = await auth.createUserWithEmailAndPassword(emailEl.value, passEl.value);
+        status.textContent = "Compte créé — connecté.";
+      } catch(e){ status.textContent = "Erreur: " + e.message; }
+    };
+    loginBtn.onclick = async () => {
+      await loadFirebase();
+      try {
+        await auth.signInWithEmailAndPassword(emailEl.value, passEl.value);
+        status.textContent = "Connecté.";
+      } catch(e){ status.textContent = "Erreur: " + e.message; }
+    };
+    logoutBtn.onclick = async () => {
+      await loadFirebase();
+      await auth.signOut();
+      status.textContent = "Déconnecté.";
+    };
+
+    // observer
+    (async ()=> {
+      await loadFirebase();
+      auth.onAuthStateChanged(u => {
+        if(u){ userEmail.textContent = u.email; logoutBtn.style.display='inline-block'; }
+        else { userEmail.textContent='Non connecté'; logoutBtn.style.display='none'; }
+      });
+    })();
+
+    // ======= File chooser & preview =======
+    pickBtn.onclick = ()=> fileInput.click();
+    uploader.onclick = ()=> fileInput.click();
+    fileInput.onchange = e => {
+      const f = e.target.files[0];
+      if(!f) return;
+      currentFile = f;
+      const url = URL.createObjectURL(f);
+      preview.src = url; preview.style.display='block';
+      resultImg.style.display='none';
+      status.textContent = "Image chargée : " + f.name;
+    };
+
+    // ======= Generate / Transform (calls backend) =======
+    generateBtn.onclick = async () => {
+      if(!currentFile){ status.textContent = "Choisis d'abord une image."; return; }
+      status.textContent = "Génération : demande au backend...";
+      generateBtn.disabled = true;
+
+      try {
+        // 1) demander au backend de générer un prompt via ChatGPT-5 (optionnel mais utile)
+        const stylePayload = {
+          mangaka: mangaka.value || "style manga standard: contrast, line-art, screen-tone",
+          effect: effect.value
+        };
+        status.textContent = "Création du prompt (ChatGPT-5)...";
+        const promptResp = await fetch(BACKEND_BASE + "/api/generate-prompt", {
+          method: "POST",
+          headers: { "Content-Type":"application/json" },
+          body: JSON.stringify(stylePayload)
+        });
+        if(!promptResp.ok) throw new Error('Erreur generation prompt');
+        const { prompt } = await promptResp.json();
+
+        // 2) envoyer l'image + prompt au backend pour traitement image
+        status.textContent = "Envoi de l'image au serveur pour le traitement...";
+        const form = new FormData();
+        form.append('image', currentFile);
+        form.append('prompt', prompt);
+        form.append('effect', effect.value);
+
+        const start = Date.now();
+        const procResp = await fetch(BACKEND_BASE + "/api/enhance-image", {
+          method: "POST",
+          body: form
+        });
+        if(!procResp.ok) throw new Error('Erreur traitement image');
+
+        // backend renvoie un fichier image (blob)
+        const blob = await procResp.blob();
+        currentResultBlob = blob;
+        const url = URL.createObjectURL(blob);
+        resultImg.src = url; resultImg.style.display = 'block';
+        downloadBtn.disabled = false;
+        timeInfo.textContent = ((Date.now()-start)/1000).toFixed(1) + "s";
+        status.textContent = "Terminé — aperçu prêt.";
+      } catch(err){
+        console.error(err);
+        status.textContent = "Erreur : " + (err.message || err);
+      } finally {
+        generateBtn.disabled = false;
+      }
+    };
+
+    // téléchargement
+    downloadBtn.onclick = () => {
+      if(!currentResultBlob) return;
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(currentResultBlob);
+      a.download = "butterflow_result.png";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    };
+
+    // petit détail: empêcher le drag default
+    window.addEventListener('dragover', e=> e.preventDefault());
+    window.addEventListener('drop', e=> e.preventDefault());
+  </script>
+</body>
+</html>
