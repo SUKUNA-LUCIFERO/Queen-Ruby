@@ -1,0 +1,37 @@
+{
+  "name": "butter-flow",
+  "version": "1.0.0",
+  "description": "Butter Flow — Crée et améliore tes mangas avec ChatGPT-5 et Firebase",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "manga",
+    "ai",
+    "chatgpt",
+    "openai",
+    "firebase",
+    "image-editing",
+    "art",
+    "express"
+  ],
+  "author": "Butter Flow Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "node-fetch": "^3.3.2",
+    "multer": "^1.4.5-lts.1",
+    "form-data": "^4.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
